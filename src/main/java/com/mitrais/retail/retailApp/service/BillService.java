@@ -10,4 +10,5 @@ import java.util.List;
 public interface BillService {
     void createCompleteBill(Bill bill);
     List<Bill> findAllBill();
+    Bill calculateDiscount(Bill bill);
 }

@@ -16,8 +16,6 @@ public class BillItem extends CommonEntity implements Serializable {
     private Double amount;
     @Column(name = "discount")
     private Integer quantity;
-    @Column(name = "discount")
-    private Double discount;
     @Column(name = "type")
     private Integer type;
 
@@ -51,14 +49,6 @@ public class BillItem extends CommonEntity implements Serializable {
 
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
-    }
-
-    public Double getDiscount() {
-        return discount;
-    }
-
-    public void setDiscount(Double discount) {
-        this.discount = discount;
     }
 
     public Bill getBill() {

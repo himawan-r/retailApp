@@ -4,6 +4,7 @@ import com.mitrais.retail.retailApp.model.User;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 
 @Entity
 @Table(name = "user", schema = "public")
@@ -28,7 +29,7 @@ public class User extends CommonEntity implements Serializable {
     public Customer customer;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
-    public Bill bill;
+    public List<Bill> bills;
 
     public User() {
 
@@ -88,12 +89,12 @@ public class User extends CommonEntity implements Serializable {
         this.affiliate = affiliate;
     }
 
-    public Bill getBill() {
-        return bill;
+    public List<Bill> getBills() {
+        return bills;
     }
 
-    public void setBill(Bill bill) {
-        this.bill = bill;
+    public void setBills(List<Bill> bills) {
+        this.bills = bills;
     }
 
     public Customer getCustomer() {

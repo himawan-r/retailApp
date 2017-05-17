@@ -17,8 +17,6 @@ public class Bill extends CommonEntity implements Serializable {
     private Double     totalAmount;
     @Column(name = "totalDiscount")
     private Double     totalDiscount;
-    @Column(name = "userid")
-    private String     userId;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "bill", cascade = CascadeType.ALL)
     public List<BillItem> billItem;
@@ -71,11 +69,4 @@ public class Bill extends CommonEntity implements Serializable {
         this.user = user;
     }
 
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
 }

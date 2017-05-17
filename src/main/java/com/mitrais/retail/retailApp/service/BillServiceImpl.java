@@ -6,6 +6,7 @@ import com.mitrais.retail.retailApp.model.Bill;
 import com.mitrais.retail.retailApp.model.BillItem;
 import com.mitrais.retail.retailApp.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
@@ -16,6 +17,7 @@ import static java.util.Calendar.YEAR;
 /**
  * Created by Himawan_R on 5/17/2017.
  */
+@Repository
 public class BillServiceImpl implements BillService {
     @Autowired
     BillRepository billDao;
@@ -36,21 +38,24 @@ public class BillServiceImpl implements BillService {
         return bills;
     }
 
-    private Bill calculateDiscount(Bill bill){
+    public Bill calculateDiscount(Bill bill){
         List<BillItem> billItems = bill.getBillItem();
         List<BillItem> others = new ArrayList<>();
-        User user = userDao.findOne(bill.getUserId());
+        User user = null;
+        if(bill.getUser() != null) {
+            user = userDao.findOne(bill.getUser().getId());
+        }
         Integer discount = 0;
 
         //separate groceries assuming 1 = groceries and other
         billItems.forEach(billItem -> {if(billItem.getType() != 1) others.add(billItem);});
 
         //count the discount, rule 6 user only get one percentage based discounts. But if all condition met we use the highest amount
-        if(user.getEmployee() != null) {
+        if(user != null && user.getEmployee() != null) {
             discount =  30;
-        } else if(user.getAffiliate() != null){
+        } else if(user != null && user.getAffiliate() != null){
             discount = 15;
-        } else if(user.getCustomer() != null && getDiffYears(user.getCustomer().getCreatedDate(), new Date()) > 2) {
+        } else if( user != null && user.getCustomer() != null && getDiffYears(user.getCustomer().getCreatedDate(), new Date()) > 2) {
             discount = 5;
         }
 
@@ -66,11 +71,11 @@ public class BillServiceImpl implements BillService {
         for(int itemCount = 0; itemCount< billItems.size(); itemCount++){
             totalAmount = totalAmount + (billItems.get(itemCount).getQuantity() * billItems.get(itemCount).getAmount());
         }
-        staticDiscount = Math.floor(totalAmount / 100);
+        staticDiscount = Math.floor(totalAmount / 100) * 5;
         totalDiscount = percentageDiscount + staticDiscount;
 
         bill.setTotalAmount(totalAmount-totalDiscount);
-        bill.setTotalDiscount(totalAmount);
+        bill.setTotalDiscount(totalDiscount);
         return bill;
     }
 
