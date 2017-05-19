@@ -63,6 +63,38 @@ public class BillServiceTest {
         return bill;
     }
 
+    private Bill createScenarioBill02(){
+        Bill bill = new Bill();
+        List<BillItem> billItemList = new ArrayList<>();
+        BillItem billItem1 = new BillItem();
+        BillItem billItem2 = new BillItem();
+        BillItem billItem3 = new BillItem();
+
+        bill.setCreatedDate(new Date());
+        bill.setUpdatedDate(new Date());
+
+        //bill item 1 is not groceries
+        billItem1.setAmount(100.00);
+        billItem1.setQuantity(2);
+        billItem1.setType(2);
+        billItemList.add(billItem1);
+
+        //bill item 2 is not groceries
+        billItem2.setAmount(50.00);
+        billItem2.setQuantity(2);
+        billItem2.setType(2);
+        billItemList.add(billItem2);
+
+        //bill item 3 is groceries
+        billItem3.setAmount(100.00);
+        billItem3.setQuantity(1);
+        billItem3.setType(1);
+        billItemList.add(billItem3);
+
+        bill.setBillItem(billItemList);
+        return bill;
+    }
+
     private User createUser(){
         User user = new User();
         user.setId(UUID.randomUUID().toString());
@@ -151,6 +183,35 @@ public class BillServiceTest {
 
         assertEquals(270, bill.getTotalAmount() , 0);
         assertEquals(30, bill.getTotalDiscount() , 0);
+    }
+
+    @Test
+    //user is not customer, user is not affiliate, user is not employee
+    //discount calc static = (400/100) *5 = 15,
+    //in addition there is some groceries worth 100
+    public void test_01_e_calculatebill_with_groceries() {
+        Bill bill = createScenarioBill02();
+        bill = billService.calculateDiscount(bill);
+
+        assertEquals(380, bill.getTotalAmount() , 0);
+        assertEquals(20, bill.getTotalDiscount() , 0);
+    }
+
+    @Test
+    //user is an employee, groceries = 100 not calculated during percentage discount
+    //discount percentage calc 30% x (400-100) = 90 + static = (400/100) *5 = 20, total discount 110, total amount 290
+    public void test_01_f_calculatebill() {
+        Bill bill = createScenarioBill02();
+        User user = createUser();
+        Employee empl = createEmployee();
+        user.setEmployee(empl);
+        bill.setUser(user);
+
+        when(userDao.findOne(anyString())).thenReturn(user);
+        bill = billService.calculateDiscount(bill);
+
+        assertEquals(290, bill.getTotalAmount() , 0);
+        assertEquals(110, bill.getTotalDiscount() , 0);
     }
 
     @Test
